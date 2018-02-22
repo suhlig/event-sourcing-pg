@@ -11,3 +11,9 @@ based on:
 ```bash
 dropdb event_sourcing_test ; createdb event_sourcing_test ; rake db:migrate
 ```
+
+# Test
+
+```bash
+bundle exec rake
+```
