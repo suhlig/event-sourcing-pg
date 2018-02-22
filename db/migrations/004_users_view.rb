@@ -7,7 +7,8 @@ Sequel.migration do
           from events
           where type = 'user_update'
         )
-      select uuid, body->>'name' as name, inserted_at from t where row_number = 1;
+      select uuid, body->>'name' as name, inserted_at from t where row_number = 1
+      with no data;
     EOS
   end
 
