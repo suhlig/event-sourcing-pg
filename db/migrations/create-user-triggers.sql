@@ -37,10 +37,10 @@ $$;
 
 create trigger event_insert_user_create after insert on events
   for each row
-  when (new.type = 'user_create')
+  when (new.type = 'user_created')
   execute procedure fn_trigger_user_create();
 
 create trigger event_insert_user_update after insert on events
   for each row
-  when (new.type = 'user_update')
+  when (new.type = 'user_updated')
   execute procedure fn_trigger_user_update();

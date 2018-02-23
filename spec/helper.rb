@@ -2,6 +2,13 @@
 
 require 'sequel'
 
+Sequel::Model.db = Sequel.connect(ENV.fetch('DB'))
+Sequel.extension :migration
+Sequel::Migrator.run(Sequel::Model.db, 'db/migrations')
+
+require 'user'
+require 'event'
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
@@ -36,16 +43,8 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 
   config.before(:suite) do
-    Sequel::Model.db = Sequel.connect(ENV.fetch('DB'))
-    Sequel.extension :migration
-    Sequel::Migrator.run(Sequel::Model.db, 'db/migrations')
-
     %i[events users].each do |table|
       Sequel::Model.db[table].truncate
     end
-  end
-
-  config.after(:suite) do
-    Sequel::Model.db.disconnect
   end
 end
