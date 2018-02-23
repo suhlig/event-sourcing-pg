@@ -1,4 +1,4 @@
-create or replace function fn_project_user_create(uuid uuid, body jsonb) returns integer as $$
+create or replace function project_user_create(uuid uuid, body jsonb) returns integer as $$
   declare result int;
   begin
     insert into users(uuid, name, inserted_at, updated_at)
@@ -8,39 +8,39 @@ create or replace function fn_project_user_create(uuid uuid, body jsonb) returns
   end;
 $$ language plpgsql security definer;
 
-create or replace function fn_project_user_update(uuid uuid, body jsonb) returns void as $$
+create or replace function project_user_update(uuid uuid, body jsonb) returns void as $$
   begin
     update users SET name = body->>'name', updated_at = NOW()
-      where users.uuid = fn_project_user_update.uuid;
+      where users.uuid = project_user_update.uuid;
   end;
 $$ language plpgsql security definer;
 
-create or replace function fn_trigger_user_create() returns trigger
+create or replace function user_create() returns trigger
   security definer
   language plpgsql
 as $$
   begin
-    perform fn_project_user_create(new.uuid, new.body);
+    perform project_user_create(new.uuid, new.body);
     return new;
   end;
 $$;
 
-create or replace function fn_trigger_user_update() returns trigger
+create or replace function user_update() returns trigger
   security definer
   language plpgsql
 as $$
   begin
-    perform fn_project_user_update(new.uuid, new.body);
+    perform project_user_update(new.uuid, new.body);
     return new;
   end;
 $$;
 
-create trigger event_insert_user_create after insert on events
+create trigger on_insert_user_create after insert on events
   for each row
   when (new.type = 'user_created')
-  execute procedure fn_trigger_user_create();
+  execute procedure user_create();
 
-create trigger event_insert_user_update after insert on events
+create trigger on_insert_user_update after insert on events
   for each row
   when (new.type = 'user_updated')
-  execute procedure fn_trigger_user_update();
+  execute procedure user_update();
