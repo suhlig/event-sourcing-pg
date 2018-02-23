@@ -1,61 +1,9 @@
 Sequel.migration do
   up do
-    run <<~EOS
-      create or replace function fn_project_user_create(uuid uuid, body jsonb) returns integer as $$
-        declare result int;
-        begin
-          insert into users(uuid, name, inserted_at, updated_at)
-          values(uuid, body->>'name', NOW(), NOW())
-          returning id into result;
-         return result;
-        end;
-      $$ language plpgsql security definer;
-
-      create or replace function fn_project_user_update(uuid uuid, body jsonb) returns void as $$
-        begin
-          update users SET name = body->>'name', updated_at = NOW()
-            where users.uuid = fn_project_user_update.uuid;
-        end;
-      $$ language plpgsql security definer;
-
-      create or replace function fn_trigger_user_create() returns trigger
-        security definer
-        language plpgsql
-      as $$
-        begin
-          perform fn_project_user_create(new.uuid, new.body);
-          return new;
-        end;
-      $$;
-
-      create or replace function fn_trigger_user_update() returns trigger
-        security definer
-        language plpgsql
-      as $$
-        begin
-          perform fn_project_user_update(new.uuid, new.body);
-          return new;
-        end;
-      $$;
-
-      create trigger event_insert_user_create after insert on events
-        for each row
-        when (new.type = 'user_create')
-        execute procedure fn_trigger_user_create();
-
-      create trigger event_insert_user_update after insert on events
-        for each row
-        when (new.type = 'user_update')
-        execute procedure fn_trigger_user_update();
-    EOS
+    run File.read("#{__dir__}/create-user-triggers.sql")
   end
 
   down do
-    run <<~EOS
-      drop function if exists fn_project_user_create(uuid uuid, body jsonb);
-      drop function if exists fn_project_user_update(uuid uuid, body jsonb);
-      drop trigger if exists event_insert_user_create ON events;
-      drop trigger if exists event_insert_user_update ON events;
-    EOS
+    run File.read("#{__dir__}/drop-user-triggers.sql")
   end
 end
