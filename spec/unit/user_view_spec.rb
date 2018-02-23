@@ -3,22 +3,29 @@
 require 'securerandom'
 
 describe :UsersView do
-  context 'an insert event occurred' do
-    let(:uuid) { SecureRandom.uuid }
+  let(:uuid) { SecureRandom.uuid }
 
+  before do
+    Event.new(
+      type: 'user_created',
+      uuid: uuid,
+      body: '{"name": "blah"}',
+    ).save
+
+    Event.new(
+      type: 'user_updated',
+      uuid: uuid,
+      body: '{"name": "someone"}',
+    ).save
+  end
+
+  it 'has no data' do
+    users = Sequel::Model.db[:users_view].where(uuid: uuid)
+    expect(users.count).to eq(0)
+  end
+
+  context 'it is refreshed' do
     before do
-      Event.new(
-        type: 'user_created',
-        uuid: uuid,
-        body: '{"name": "blah"}',
-      ).save
-
-      Event.new(
-        type: 'user_updated',
-        uuid: uuid,
-        body: '{"name": "someone"}',
-      ).save
-
       Sequel::Model.db.refresh_view(:users_view)
     end
 
