@@ -6,7 +6,7 @@ based on:
 * https://github.com/tobyhede/postgresql-event-sourcing/blob/master/README.md
 * https://gist.github.com/janko-m/87865c47500a90302152#file-02-sequel-rb
 * https://hashrocket.com/blog/posts/materialized-view-strategies-using-postgresql#lazy-materialized-view
-* https://vaughnvernon.co/?p=942 ([archived copy](http://web.archive.org/web/20180827122628/https://vaughnvernon.co/?p=942))
+* https://vaughnvernon.co/?p=942 ([archived copy](http://web.archive.org/web/20180827122628/https://vaughnvernon.co/?p=942), [migrated](https://kalele.io/the-ideal-domain-driven-design-aggregate-store/))
 
 # Setup
 
